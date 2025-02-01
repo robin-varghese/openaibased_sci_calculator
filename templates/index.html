@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Math Calculator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> </head>
+<body>
+    <h1>Math Calculator</h1>
+    <input type="text" id="expression" placeholder="Enter expression">
+    <button onclick="calculate()">Calculate</button>
+    <div id="result"></div>
+
+    <script>
+        function calculate() {
+            var expression = $("#expression").val();
+            $.ajax({
+                type: "POST",
+                url: "/calculate",
+                contentType: "application/json",
+                data: JSON.stringify({ "expression": expression }),
+                success: function (data) {
+                    if (data.result) {
+                        $("#result").text("Result: " + data.result);
+                    } else if (data.message) {
+                      $("#result").text("Result: " + data.result + ". Message:" + data.message);
+                    } else {
+                        $("#result").text("Error: " + data.error);
+                    }
+                },
+                error: function (error) {
+                    $("#result").text("Error: " + error.responseJSON.error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
