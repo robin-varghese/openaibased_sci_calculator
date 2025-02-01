@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import openai
 import os
 from dotenv import load_dotenv
@@ -45,7 +45,8 @@ def calculate():
         prompt = f"""
         You are a helpful calculator. Evaluate the following arithmetic expression and provide the result.
         Expression: {expression}
-        Only provide the result. Do not provide any explanations.
+        Provide the result and the explanation in the format
+        result : Explanation
         """
 
         result = get_completion(prompt)
@@ -54,15 +55,19 @@ def calculate():
             return jsonify({"error": "Failed to get a response from OpenAI"}), 500
 
         try:
-          #Attempt to convert the result to a float to ensure it's a number
-          numeric_result = float(result)
-          return jsonify({"result": numeric_result}), 200
+            numeric_result = float(result)
+            return jsonify({"result": numeric_result}), 200
         except ValueError:
-          return jsonify({"result": result, "message":"The result from the llm is not a valid number"}), 200
-        
+            return jsonify({"result": result, "message": "The result from the llm is not a valid number"}), 200
 
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
+
+
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')  # Render the HTML page
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))

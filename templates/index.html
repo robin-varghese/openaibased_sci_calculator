@@ -1,17 +1,123 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Math Calculator</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> </head>
-<body>
-    <h1>Math Calculator</h1>
-    <input type="text" id="expression" placeholder="Enter expression">
-    <button onclick="calculate()">Calculate</button>
-    <div id="result"></div>
+    <title>Scientific Calculator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0; /* Light gray background */
+        }
 
+        .calculator {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: #fff; /* White calculator body */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+        }
+
+        .display {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: right;
+            background-color: #eee; /* Light gray display */
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #f2f2f2; /* Light gray buttons */
+        }
+        button:hover{
+          background-color: #ddd;
+        }
+        .operator {
+            background-color: #e0e0e0; /* Slightly darker gray for operators */
+        }
+
+        .equal {
+            background-color: #4CAF50; /* Green for equals */
+            color: white;
+        }
+        .equal:hover{
+          background-color: #43A047;
+        }
+
+        .clear {
+            background-color: #f44336; /* Red for clear */
+            color: white;
+        }
+        .clear:hover{
+          background-color: #D32F2F;
+        }
+        #result{
+          margin-top: 10px;
+          font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" class="display" readonly>
+        <div class="buttons">
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('*')">*</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button class="equal" onclick="calculate()">=</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="operator" onclick="appendToDisplay('**')">^</button>
+            <button class="operator" onclick="appendToDisplay('(')">(</button>
+            <button class="operator" onclick="appendToDisplay(')')">)</button>
+            <button class="operator" onclick="appendToDisplay('sqrt(')">√</button>
+
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        let display = document.getElementById('display');
+
+        function appendToDisplay(value) {
+            display.value += value;
+        }
+
+        function clearDisplay() {
+            display.value = '';
+        }
+
         function calculate() {
-            var expression = $("#expression").val();
+            var expression = display.value;
             $.ajax({
                 type: "POST",
                 url: "/calculate",
@@ -20,8 +126,10 @@
                 success: function (data) {
                     if (data.result) {
                         $("#result").text("Result: " + data.result);
+                        display.value = data.result; // Update display with the result
                     } else if (data.message) {
-                      $("#result").text("Result: " + data.result + ". Message:" + data.message);
+                        $("#result").text("Result: " + data.result + ". Message:" + data.message);
+                        display.value = data.result;
                     } else {
                         $("#result").text("Error: " + data.error);
                     }
